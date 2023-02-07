@@ -1,6 +1,12 @@
 const express = require("express");
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const {
+  MongoClient,
+  ServerApiVersion,
+  ObjectId,
+  CURSOR_FLAGS,
+} = require("mongodb");
 const cors = require("cors");
+var jwt = require("jsonwebtoken");
 const app = express();
 const port = process.env.PORT || 5000;
 require("dotenv").config();
@@ -18,6 +24,16 @@ async function run() {
   try {
     const servicesCollection = client.db("autoZone").collection("services");
     const orderCollection = client.db("autoZone").collection("order");
+
+    app.post("/jwt", async (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
+        expiresIn: "1h",
+      });
+      res.send(token);
+      console.log(user);
+    });
+
     app.get("/services", async (req, res) => {
       const query = {};
       const cursor = await servicesCollection.find(query).toArray();
