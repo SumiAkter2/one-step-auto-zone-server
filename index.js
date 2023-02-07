@@ -45,6 +45,13 @@ async function run() {
       const cursor = await orderCollection.find(query).toArray();
       res.send(cursor);
     });
+
+    app.delete("/orders/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await orderCollection.deleteOne(query);
+      res.send(result);
+    });
   } finally {
   }
 }
