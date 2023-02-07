@@ -19,7 +19,21 @@ const client = new MongoClient(uri, {
   useUnifiedTopology: true,
   serverApi: ServerApiVersion.v1,
 });
-
+function verifyJWT(req, res, next) {
+  console.log(req.headers);
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    res.status(401).send({ message: "UnAuthorized access" });
+  }
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
+    if (err) {
+      res.status(401).send({ message: "UnAuthorized access" });
+    }
+    req.decoded = decoded;
+    next();
+  });
+}
 async function run() {
   try {
     const servicesCollection = client.db("autoZone").collection("services");
@@ -30,7 +44,7 @@ async function run() {
       const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
         expiresIn: "1h",
       });
-      res.send(token);
+      res.send({ token });
       console.log(user);
     });
 
@@ -51,7 +65,11 @@ async function run() {
       const result = await orderCollection.insertOne(order);
       res.send(result);
     });
-    app.get("/orders", async (req, res) => {
+    app.get("/orders", verifyJWT, async (req, res) => {
+      const decoded = req.decoded;
+      if (decoded.email !== req.query.email) {
+        res.status(403).send({ message: "UnAuthorized access" });
+      }
       let query = {};
       if (req.query.email) {
         query = {
