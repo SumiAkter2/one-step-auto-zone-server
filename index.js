@@ -25,14 +25,16 @@ function verifyJWT(req, res, next) {
   if (!authHeader) {
     res.status(401).send({ message: "UnAuthorized access" });
   }
-  const token = authHeader.split(" ")[1];
-  jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
-    if (err) {
-      res.status(401).send({ message: "UnAuthorized access" });
-    }
-    req.decoded = decoded;
-    next();
-  });
+  if (authHeader) {
+    const token = authHeader.split(" ")[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
+      if (err) {
+        res.status(401).send({ message: "UnAuthorized access" });
+      }
+      req.decoded = decoded;
+      next();
+    });
+  }
 }
 async function run() {
   try {
