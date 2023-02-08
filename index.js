@@ -60,7 +60,7 @@ async function run() {
       const service = await servicesCollection.findOne(filter);
       res.send(service);
     });
-    app.post("/order", async (req, res) => {
+    app.post("/order", verifyJWT, async (req, res) => {
       const order = req.body;
       const result = await orderCollection.insertOne(order);
       res.send(result);
@@ -79,7 +79,7 @@ async function run() {
       const cursor = await orderCollection.find(query).toArray();
       res.send(cursor);
     });
-    app.patch("/orders/:id", async (req, res) => {
+    app.patch("/orders/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const status = req.body.status;
       const query = { _id: new ObjectId(id) };
@@ -91,7 +91,7 @@ async function run() {
       const result = await orderCollection.updateOne(query, updatedDoc);
       res.send(result);
     });
-    app.delete("/orders/:id", async (req, res) => {
+    app.delete("/orders/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await orderCollection.deleteOne(query);
