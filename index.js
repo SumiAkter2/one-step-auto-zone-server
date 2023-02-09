@@ -51,11 +51,13 @@ async function run() {
     });
 
     app.get("/services", async (req, res) => {
-      const query = {};
+      // const query = { price: { $gt: 100 } };
+      const query = { price: { $lt: 120 } };
+      // const query = {};
       const order = req.query.order === "asc" ? 1 : -1;
       const cursor = await servicesCollection
         .find(query)
-        .sort({ price: 1 })
+        .sort({ price: order })
         .toArray();
       res.send(cursor);
     });
