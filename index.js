@@ -58,7 +58,17 @@ async function run() {
       // const query = {
       //   $and: [{ price: { $gt: 150 } }, { price: { $gt: 100 } }],
       // };
-      const query = {};
+      const search = req.query.search;
+      let query = {};
+      if (search.length) {
+        query = {
+          $text: {
+            $search: search,
+          },
+        };
+      }
+
+      console.log(search);
       const order = req.query.order === "asc" ? 1 : -1;
       const cursor = await servicesCollection
         .find(query)
