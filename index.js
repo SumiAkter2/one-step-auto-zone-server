@@ -52,7 +52,10 @@ async function run() {
 
     app.get("/services", async (req, res) => {
       const query = {};
-      const cursor = await servicesCollection.find(query).toArray();
+      const cursor = await servicesCollection
+        .find(query)
+        .sort({ price: 1 })
+        .toArray();
       res.send(cursor);
     });
 
